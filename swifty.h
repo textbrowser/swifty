@@ -42,13 +42,18 @@ class swifty: public QNetworkAccessManager
 	 const QUrl &url,
 	 QObject *parent):QNetworkAccessManager(parent)
   {
-    m_current_version = current_version;
+    m_current_version = m_newest_version = current_version;
     m_search_for_string = search_for_string;
     m_url = url;
   }
 
   ~swifty()
   {
+  }
+
+  QString newest_version(void) const
+  {
+    return m_newest_version;
   }
 
   void download()
@@ -73,6 +78,7 @@ class swifty: public QNetworkAccessManager
   QByteArray m_buffer;
   QPointer<QNetworkReply> m_reply;
   QString m_current_version;
+  QString m_newest_version;
   QString m_search_for_string;
   QUrl m_url;
 
@@ -93,7 +99,12 @@ class swifty: public QNetworkAccessManager
 	  trimmed();
 
 	if(m_current_version != version)
-	  emit different(version);
+	  {
+	    m_newest_version = version;
+	    emit different(m_newest_version);
+	  }
+	else
+	  emit same();
       }
   }
 
@@ -105,6 +116,7 @@ class swifty: public QNetworkAccessManager
 
  signals:
   void different(const QString &new_version);
+  void same(void);
 };
 
 #endif
