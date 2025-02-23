@@ -111,7 +111,15 @@ class swifty: public QNetworkAccessManager
   void slot_ready_read(void)
   {
     while(m_reply && m_reply->bytesAvailable() > 0)
-      m_buffer.append(m_reply->readAll());
+      {
+	m_buffer.append(m_reply->readAll());
+
+	if(30000 < m_buffer.size())
+	  {
+	    m_reply->abort();
+	    break;
+	  }
+      }
   }
 
  signals:
